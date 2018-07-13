@@ -32,10 +32,16 @@
                     <img id="qr_img" src="">
                 </div>
                 <div class="form-group form-check">
-                    <input class="form-control" type="text" name="passcode" id="passcode" value="">
+                    <label>Enter token</label>
+                    <input placeholder="Enter token" class="form-control" type="text" name="passcode" id="passcode" value="">
+                    <br/>
+                    <label>Secret</label>
+                    <input class="form-control" type="text" disabled value="" id="secret">
                 </div>
                 <div class="form-group form-check">
-                    <button id="btn_enable" type="submit" class="btn sml btn-success" name="btn-enable">Enable</button>
+                    <button id="btn_verify" type="submit" class="btn sml btn-success" name="btn-enable">Enable</button>
+                    
+                    <div id="res" style="display:  inline-block; padding: 5px;background: #eee;     margin-left:  20px;"></div>
                 </div>
             </div>
         </div>
@@ -57,19 +63,29 @@
                         var newData = JSON.stringify(data)
                         var obj = JSON.parse(newData);
                         var qrImg = obj.qrImgUrl;
+                        var secret = obj.secret;
+
                         $("#qrBlock").show();
+                        $("#secret").val(secret);
                         $("#qr_img").attr('src',qrImg);
                     })
                 }
             })
 
-            $("#btn_enable").on("click",()=>{
-                var passcode = $("#passcode").val();                
-                var objEnable = {"action":"enable","key":passcode}
-                $.post('http://localhost:3000/enable',objEnable,(data)=>{
+            $("#btn_verify").on("click",()=>{
+                var passcode = $("#passcode").val();
+                var secret = $("#secret").val();
+                var objEnable = {"action":"enable","token":passcode,"secret":secret}
+                $.post('http://localhost:3000/verify',objEnable,(data)=>{
                     var newData = JSON.stringify(data)
                     var obj = JSON.parse(newData);
-                    console.log(obj);                    
+                    if( obj.status == true ){
+                        $("#res").html("valid token")
+                    }else{
+                        $("#res").html("Invalid token")
+                    }
+                    console.log(obj);
+                    
                 })
                 
             })
